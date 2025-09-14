@@ -7,7 +7,7 @@ public class UserDto : IValidator<UserDto> {
     public string? Password { get; set; }
     public string? Phone { get; set; }
 
-    public void Validate(in UserDto instance, ref ValidationResult result) {
+    public void Validate(in UserDto instance, ref ValidationResult<string> result) {
         // Name: required, length 1..100
         if (string.IsNullOrWhiteSpace(instance.Name)) {
             result.AddError($"'{nameof(Name)}' must be non-empty");

@@ -5,9 +5,9 @@ namespace Verifast;
 /// <summary>
 /// Validation result
 /// </summary>
-public struct ValidationResult {
-    private List<string>? _errors;
-    private List<string>? _warnings;
+public struct ValidationResult<TMessage> {
+    private List<TMessage>? _errors;
+    private List<TMessage>? _warnings;
 
     /// <summary>
     /// The result is valid if no errors were found.
@@ -15,27 +15,27 @@ public struct ValidationResult {
     public readonly bool IsValid => _errors is null or { Count: 0 };
 
     /// <summary>
-    /// A <see cref="ReadOnlyCollection{string}"/> of the <see cref="Errors"/>
+    /// A <see cref="ReadOnlyCollection{TMessage}"/> of the <see cref="Errors"/>
     /// </summary>
-    public readonly ReadOnlyCollection<string> Errors
+    public readonly ReadOnlyCollection<TMessage> Errors
         => _errors is not null
-        ? new ReadOnlyCollection<string>(_errors)
-        : ReadOnlyCollection<string>.Empty;
+        ? new ReadOnlyCollection<TMessage>(_errors)
+        : ReadOnlyCollection<TMessage>.Empty;
 
     /// <summary>
-    /// A <see cref="ReadOnlyCollection{string}"/> of the <see cref="Warnings"/>
+    /// A <see cref="ReadOnlyCollection{TMessage}"/> of the <see cref="Warnings"/>
     /// </summary>
-    public readonly ReadOnlyCollection<string> Warnings
+    public readonly ReadOnlyCollection<TMessage> Warnings
         => _warnings is not null
-        ? new ReadOnlyCollection<string>(_warnings)
-        : ReadOnlyCollection<string>.Empty;
+        ? new ReadOnlyCollection<TMessage>(_warnings)
+        : ReadOnlyCollection<TMessage>.Empty;
 
     /// <summary>
     /// Adds an error to the validation result
     /// </summary>
     /// <param name="message"></param>
-    public void AddError(string message) {
-        _errors ??= new List<string>();
+    public void AddError(TMessage message) {
+        _errors ??= new List<TMessage>();
         _errors.Add(message);
     }
 
@@ -43,8 +43,8 @@ public struct ValidationResult {
     /// Adds a warning to the validation result
     /// </summary>
     /// <param name="message"></param>
-    public void AddWarning(string message) {
-        _warnings ??= new List<string>();
+    public void AddWarning(TMessage message) {
+        _warnings ??= new List<TMessage>();
         _warnings.Add(message);
     }
 }
