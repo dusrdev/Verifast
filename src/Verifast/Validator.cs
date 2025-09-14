@@ -6,6 +6,10 @@ public interface IValidator<T> where T : allows ref struct {
 	void Validate(in T instance, ref ValidationResult result);
 }
 
+public interface IAsyncValidator<T> where T : allows ref struct {
+	ValueTask<ValidationResult> ValidateAsync(in T instance, CancellationToken cancellationToken = default);
+}
+
 public static class Validator {
 	public static ValidationResult Validate<TValidator, T>(this TValidator validator, in T instance)
 		where TValidator : IValidator<T>, allows ref struct
@@ -21,5 +25,11 @@ public static class Validator {
 		result = default;
 		validator.Validate(in instance, ref result);
 		return result.IsValid;
+	}
+
+	public static ValueTask<ValidationResult> ValidateAsync<TValidator, T>(this TValidator validator, in T instance, CancellationToken cancellationToken = default)
+		where TValidator : IAsyncValidator<T>, allows ref struct
+		where T : allows ref struct {
+		return validator.ValidateAsync(instance, cancellationToken);
 	}
 }
