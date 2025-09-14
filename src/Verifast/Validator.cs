@@ -26,9 +26,4 @@ public static class Validator {
         validator.Validate(in instance, ref result);
         return result.IsValid;
     }
-
-    public static ValueTask<ValidationResult> ValidateAsync<TValidator, T>(this TValidator validator, in T instance, CancellationToken cancellationToken = default)
-        where TValidator : IAsyncValidator<T> {
-        return validator.ValidateAsync(instance, cancellationToken);
-    }
 }
