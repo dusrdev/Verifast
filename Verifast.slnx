@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Verifast/Verifast.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Verifast.Tests.Unit/Verifast.Tests.Unit.csproj" />
+  </Folder>
+</Solution>
