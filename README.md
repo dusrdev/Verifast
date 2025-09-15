@@ -61,6 +61,7 @@ if (!validator.TryValidate(person, out var result))
 ```
 
 ### Async validators
+
 ```csharp
 public readonly struct PersonAsyncValidator : IAsyncValidator<Person>
 {
@@ -80,6 +81,7 @@ public readonly struct PersonAsyncValidator : IAsyncValidator<Person>
 ```
 
 ### Custom message types
+
 Use `TMessage` to avoid string allocations or to carry rich metadata.
 
 ```csharp
@@ -98,46 +100,3 @@ public readonly struct CustomValidator : IValidator<int, ValidationMessage>
     }
 }
 ```
-
-## Running Tests
-Per repository conventions, run tests via `dotnet run` (builds implicitly):
-
-```
-dotnet run --project tests/Verifast.Tests.Unit
-```
-
-List tests (Microsoft Testing Platform semantics):
-```
-dotnet run --project tests/Verifast.Tests.Unit -- --list-tests
-```
-
-Run a single test by method or class filter:
-```
-dotnet run --project tests/Verifast.Tests.Unit --filter-method="*TestMethodPattern*"
-dotnet run --project tests/Verifast.Tests.Unit --filter-class="*TestClassPattern*"
-```
-
-## Formatting
-Analyze only:
-```
-dotnet format analyze --severity info
-```
-
-Apply style/whitespace fixes:
-```
-dotnet format
-```
-
-If `dotnet format` is missing, install the tool:
-```
-dotnet tool update -g dotnet-format
-```
-
-## Design Notes
-- Contracts use constraints that allow validators to work with `ref struct` scenarios without forcing `ref struct` everywhere.
-- `ValidationResult<TMessage>` captures errors/warnings on demand to minimize allocations.
-- Numeric helpers use generic math (`INumber<T>`) where appropriate.
-
-## License
-MIT — see `LICENSE` for details.
-
