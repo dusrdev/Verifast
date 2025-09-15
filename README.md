@@ -40,7 +40,7 @@ Or get a simple pass/fail while still capturing details:
 
 ```csharp
 if (!user.TryValidate(user, out var result))
-    Console.WriteLine($"Invalid: {string.Join(", ", result.Errors)}");
+    foreach (var error in result.Errors) Console.WriteLine(error);
 ```
 
 ## Async Validation
