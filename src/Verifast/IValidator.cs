@@ -4,6 +4,7 @@
 /// Interface for implementing a synchronous validator for <typeparamref name="T"/> with message type <typeparamref name="TMessage"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
+/// <typeparam name="TMessage"></typeparam>
 public interface IValidator<T, TMessage> where T : allows ref struct {
     /// <summary>
     /// Validate method
@@ -30,6 +31,7 @@ public interface IValidator<T> where T : allows ref struct {
 /// Interface for implementing an asynchronous validator for <typeparamref name="T"/> with message type <typeparamref name="TMessage"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
+/// <typeparam name="TMessage"></typeparam>
 public interface IAsyncValidator<T, TMessage> {
     /// <summary>
     /// ValidateAsync method

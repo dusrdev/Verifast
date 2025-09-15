@@ -9,6 +9,7 @@ public static class Validator {
     /// </summary>
     /// <typeparam name="TValidator"></typeparam>
     /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TMessage"></typeparam>
     /// <param name="validator"></param>
     /// <param name="instance"></param>
     /// <returns></returns>
@@ -41,6 +42,7 @@ public static class Validator {
     /// </summary>
     /// <typeparam name="TValidator"></typeparam>
     /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TMessage"></typeparam>
     /// <param name="validator"></param>
     /// <param name="instance"></param>
     /// <param name="result"></param>
