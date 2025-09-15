@@ -37,9 +37,9 @@ public interface IAsyncValidator<T, TMessage> {
     /// ValidateAsync method
     /// </summary>
     /// <param name="instance"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="ct"></param>
     /// <returns></returns>
-    ValueTask<ValidationResult<TMessage>> ValidateAsync(T instance, CancellationToken cancellationToken = default);
+    ValueTask<ValidationResult<TMessage>> ValidateAsync(T instance, CancellationToken ct = default);
 }
 
 /// <summary>
@@ -51,7 +51,7 @@ public interface IAsyncValidator<T> {
     /// ValidateAsync method
     /// </summary>
     /// <param name="instance"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="ct"></param>
     /// <returns></returns>
-    ValueTask<ValidationResult<string>> ValidateAsync(T instance, CancellationToken cancellationToken = default);
+    ValueTask<ValidationResult<string>> ValidateAsync(T instance, CancellationToken ct = default);
 }

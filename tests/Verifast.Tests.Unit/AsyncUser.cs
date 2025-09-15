@@ -1,3 +1,4 @@
+
 namespace Verifast.Tests.Unit;
 
 public class AsyncUserDto : IAsyncValidator<AsyncUserDto> {
@@ -7,10 +8,10 @@ public class AsyncUserDto : IAsyncValidator<AsyncUserDto> {
     public string? Password { get; set; }
     public string? Phone { get; set; }
 
-    public async ValueTask<ValidationResult<string>> ValidateAsync(AsyncUserDto instance, CancellationToken cancellationToken = default) {
+    public async ValueTask<ValidationResult<string>> ValidateAsync(AsyncUserDto instance, CancellationToken ct = default) {
         // Emulate asynchronous work so tests exercise the async path
         await Task.Yield();
-        cancellationToken.ThrowIfCancellationRequested();
+        ct.ThrowIfCancellationRequested();
 
         var result = new ValidationResult<string>();
 
