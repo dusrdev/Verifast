@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>1.0.0.0</Version>
+
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -10,6 +12,33 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+
+    <Authors>David Shnayder</Authors>
+    <Copyright>David Shnayder</Copyright>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageId>Verifast</PackageId>
+    <Title>Verifast</Title>
+    <Description>A hyper-light performance-oriented NoSQL database</Description>
+    <PackageProjectUrl>https://github.com/dusrdev/Verifast</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dusrdev/Verifast</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Validation;HighPerformance;LowAllocation;HotPath</PackageTags>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/" Link="README.md" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>
