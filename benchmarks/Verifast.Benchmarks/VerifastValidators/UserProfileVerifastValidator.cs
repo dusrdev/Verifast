@@ -2,7 +2,7 @@ using Verifast.Benchmarks.Models;
 
 namespace Verifast.Benchmarks.VerifastValidators;
 
-public sealed class UserProfileValidator : IValidator<UserProfile> {
+public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile> {
     public void Validate(in UserProfile instance, ref ValidationResult<string> result) {
         if (instance.Id == Guid.Empty) {
             result.AddError("Id must not be empty.");

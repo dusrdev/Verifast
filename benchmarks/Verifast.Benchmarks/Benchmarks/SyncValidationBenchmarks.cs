@@ -33,7 +33,7 @@ public class SyncValidationBenchmarks {
 
     [Benchmark]
     public int Verifast() {
-        var validator = new UserProfileValidator();
+        var validator = new UserProfileVerifastValidator();
         var result = validator.Validate(_dto!);
         return result.Errors.Count;
     }

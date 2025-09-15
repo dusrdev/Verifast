@@ -3,10 +3,10 @@ using Verifast.Benchmarks.Models;
 
 namespace Verifast.Benchmarks.VerifastValidators;
 
-public sealed class AsyncUserProfileValidator : IAsyncValidator<UserProfile> {
+public sealed class AsyncUserProfileVerifastValidator : IAsyncValidator<UserProfile> {
     private readonly FakeUserRepository _repo;
 
-    public AsyncUserProfileValidator(FakeUserRepository repo) {
+    public AsyncUserProfileVerifastValidator(FakeUserRepository repo) {
         _repo = repo;
     }
 

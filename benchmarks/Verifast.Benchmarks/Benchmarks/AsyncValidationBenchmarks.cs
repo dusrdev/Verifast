@@ -39,7 +39,7 @@ public class AsyncValidationBenchmarks {
 
     [Benchmark]
     public async Task<int> Verifast_Async() {
-        var validator = new AsyncUserProfileValidator(_repo);
+        var validator = new AsyncUserProfileVerifastValidator(_repo);
         var result = await validator.ValidateAsync(_dto!);
         return result.Errors.Count;
     }
