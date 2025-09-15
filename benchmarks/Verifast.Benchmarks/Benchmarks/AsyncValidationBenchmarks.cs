@@ -6,7 +6,11 @@ using Verifast.Benchmarks.VerifastValidators;
 
 namespace Verifast.Benchmarks.Benchmarks;
 
+[MediumRunJob]
 [MemoryDiagnoser]
+[RankColumn]
+[ReturnValueValidator]
+[Config(typeof(TrentRatioConfig))]
 public class AsyncValidationBenchmarks {
     [Params(true, false)]
     public bool DtoValid { get; set; }
