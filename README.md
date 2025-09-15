@@ -1,6 +1,11 @@
 # Verifast
 
-High‑performance, allocation‑friendly validation for .NET >= 9. No complicated APIs, no expression trees — just plain C#. Implement a tiny interface, add errors or warnings, and you’re done.
+[![NuGet](https://img.shields.io/nuget/v/Verifast.svg?style=flat-square)](https://www.nuget.org/packages/Verifast)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Verifast.svg?style=flat-square)](https://www.nuget.org/packages/Verifast)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=flat-square)](#)
+
+High‑performance, allocation‑friendly validation for .NET 9 and above. No complicated APIs, no expression trees - just plain C#. Implement a tiny interface, add errors or warnings, and you’re done.
 
 ## Why Verifast
 
@@ -10,28 +15,33 @@ High‑performance, allocation‑friendly validation for .NET >= 9. No complicat
 - Plays well with `ref struct`: APIs are designed to enable stack‑only scenarios.
 - Your messages, your way: use `string` or a custom `TMessage` for richer metadata.
 
+## Install
+
+```bash
+dotnet add package Verifast
+```
+
 ## Quick Start
 
-Define validation by implementing the interface on your type (or on a separate validator). Then call the extension helpers.
+Define your model and implement its validator. Then call the extension helpers.
 
 ```csharp
 using Verifast;
 
-public sealed class User : IValidator<User> {
-    public string? Name { get; init; }
-    public int Age { get; init; }
+public readonly record struct User(string? Name, int Age);
 
+public readonly ref struct UserValidator : IValidator<User> {
     public void Validate(in User instance, ref ValidationResult<string> result) {
         if (string.IsNullOrWhiteSpace(instance.Name))
             result.AddError("'Name' must be non-empty");
-
         if (instance.Age is < 18 or > 120)
             result.AddError("'Age' must be between 18 and 120");
     }
 }
 
-var user = new User { Name = "Ada", Age = 33 };
-var result = user.Validate(user);
+var user = new User("Ada", 33);
+var validator = new UserValidator();
+var result = validator.Validate(user);
 if (!result.IsValid)
     foreach (var error in result.Errors) Console.WriteLine(error);
 ```
@@ -39,7 +49,7 @@ if (!result.IsValid)
 Or get a simple pass/fail while still capturing details:
 
 ```csharp
-if (!user.TryValidate(user, out var result))
+if (!validator.TryValidate(user, out var result))
     foreach (var error in result.Errors) Console.WriteLine(error);
 ```
 
@@ -48,18 +58,16 @@ if (!user.TryValidate(user, out var result))
 Prefer async? Implement `IAsyncValidator<T>` and return a `ValueTask<ValidationResult<TMessage>>`.
 
 ```csharp
-using Verifast;
+public record AsyncUser(string? Email);
 
-public sealed class AsyncUser : IAsyncValidator<AsyncUser> {
-    public string? Email { get; init; }
-
+public sealed class AsyncUserValidator : IAsyncValidator<AsyncUser> {
     public async ValueTask<ValidationResult<string>> ValidateAsync(AsyncUser instance, CancellationToken ct = default) {
         await Task.Yield(); // e.g., call a store or service
 
-        ValidationResult<string> result = default; // valid by default struct
+        ValidationResult<string> result = default;
         if (!string.IsNullOrWhiteSpace(instance.Email))
             if (!LooksLikeEmail(instance.Email!))
-                result.AddError($"'{nameof(Email)}' must be a valid email");
+                result.AddError("'Email' must be a valid email");
 
         return result;
 
@@ -96,9 +104,9 @@ if (!new EvenValidator().TryValidate(3, out var res))
 
 ## Design Philosophy
 
-- Pure language constructs: write straightforward `if`/`for` statements — no fluent builders, no new mental model, onboarding takes minutes.
+- Pure language constructs: write straightforward `if`/`for` statements - no fluent builders, no new mental model, onboarding takes minutes.
 - Allocation‑aware: messages are captured on demand; zero allocations when data is valid.
 
 ## License
 
-MIT — see `LICENSE`.
+MIT - see `LICENSE`.
