@@ -20,7 +20,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <PackageId>Verifast</PackageId>
     <Title>Verifast</Title>
-    <Description>A hyper-light performance-oriented NoSQL database</Description>
+    <Description>A lightweight high performance validation library for hot paths</Description>
     <PackageProjectUrl>https://github.com/dusrdev/Verifast</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dusrdev/Verifast</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
