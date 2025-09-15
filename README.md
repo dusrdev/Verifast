@@ -1,102 +1,104 @@
 # Verifast
 
-Fast, allocation‑friendly validation for .NET 9 with a focused, interface‑driven API. Verifast centers on simple validators and a lightweight result type that captures errors and warnings on demand.
+High‑performance, allocation‑friendly validation for .NET >= 9. No complicated APIs, no expression trees — just plain C#. Implement a tiny interface, add errors or warnings, and you’re done.
 
-## Features
+## Why Verifast
 
-- Lean contracts: `IValidator<T, TMessage>`, `IValidator<T>`, `IAsyncValidator<T, TMessage>`, `IAsyncValidator<T>`.
-- Lightweight results: struct based `ValidationResult<TMessage>` tracks validity, errors, and warnings with minimal allocations.
-- Orchestrator helpers: static `Validator` extensions to run validation and `TryValidate` patterns.
-- Ref‑friendly design: contracts are compatible with `ref struct` scenarios.
+- Minimal API: implement `IValidator<T>` or `IAsyncValidator<T>` and write ordinary C#.
+- Fast by design: struct based `ValidationResult<TMessage>` allocates only when you add messages.
+- Ergonomic helpers: call `.Validate(...)` for a result or `.TryValidate(...)` for a quick bool.
+- Plays well with `ref struct`: APIs are designed to enable stack‑only scenarios.
+- Your messages, your way: use `string` or a custom `TMessage` for richer metadata.
 
-## Getting Started
+## Quick Start
 
-### Download via nuget
-
-```bash
-dotnet add package Verifast
-```
-
-## Usage
-
-Below is a minimal example showing the synchronous contract and the orchestrator helpers.
+Define validation by implementing the interface on your type (or on a separate validator). Then call the extension helpers.
 
 ```csharp
 using Verifast;
 
-public readonly record struct Person(string Name, int Age);
+public sealed class User : IValidator<User> {
+    public string? Name { get; init; }
+    public int Age { get; init; }
 
-public readonly struct PersonValidator : IValidator<Person>
-{
-    public ValidationResult<string> Validate(in Person person)
-    {
-        var result = ValidationResult.Create<string>();
+    public void Validate(in User instance, ref ValidationResult<string> result) {
+        if (string.IsNullOrWhiteSpace(instance.Name))
+            result.AddError("'Name' must be non-empty");
 
-        if (string.IsNullOrWhiteSpace(person.Name))
-        {
-            result.AddError("Name is required.");
-        }
-
-        if (person.Age < 0 || person.Age > 130)
-        {
-            result.AddError("Age must be between 0 and 130.");
-        }
-
-        return result;
+        if (instance.Age is < 18 or > 120)
+            result.AddError("'Age' must be between 18 and 120");
     }
 }
 
-// Run validation
-var person = new Person("Ada", 33);
-var validator = new PersonValidator();
-
-// Orchestrator helpers
-if (!validator.TryValidate(person, out var result))
-{
-    foreach (var error in result.Errors)
-    {
-        Console.WriteLine(error);
-    }
-}
+var user = new User { Name = "Ada", Age = 33 };
+var result = user.Validate(user);
+if (!result.IsValid)
+    foreach (var error in result.Errors) Console.WriteLine(error);
 ```
 
-### Async validators
+Or get a simple pass/fail while still capturing details:
 
 ```csharp
-public readonly struct PersonAsyncValidator : IAsyncValidator<Person>
-{
-    public async ValueTask<ValidationResult<string>> ValidateAsync(Person person, CancellationToken ct = default)
-    {
-        // Perform async checks as needed
-        await Task.Yield();
-
-        var result = ValidationResult.Create<string>();
-        if (string.IsNullOrWhiteSpace(person.Name))
-        {
-            result.AddError("Name is required.");
-        }
-        return result;
-    }
-}
+if (!user.TryValidate(user, out var result))
+    Console.WriteLine($"Invalid: {string.Join(", ", result.Errors)}");
 ```
 
-### Custom message types
+## Async Validation
 
-Use `TMessage` to avoid string allocations or to carry rich metadata.
+Prefer async? Implement `IAsyncValidator<T>` and return a `ValueTask<ValidationResult<TMessage>>`.
 
 ```csharp
-public readonly record struct ValidationMessage(string Code, string Text);
+using Verifast;
 
-public readonly struct CustomValidator : IValidator<int, ValidationMessage>
-{
-    public ValidationResult<ValidationMessage> Validate(in int value)
-    {
-        var result = ValidationResult.Create<ValidationMessage>();
-        if (value % 2 != 0)
-        {
-            result.AddError(new ValidationMessage("NotEven", "Value must be even."));
-        }
+public sealed class AsyncUser : IAsyncValidator<AsyncUser> {
+    public string? Email { get; init; }
+
+    public async ValueTask<ValidationResult<string>> ValidateAsync(AsyncUser instance, CancellationToken ct = default) {
+        await Task.Yield(); // e.g., call a store or service
+
+        ValidationResult<string> result = default; // valid by default struct
+        if (!string.IsNullOrWhiteSpace(instance.Email))
+            if (!LooksLikeEmail(instance.Email!))
+                result.AddError($"'{nameof(Email)}' must be a valid email");
+
         return result;
+
+        static bool LooksLikeEmail(string s) {
+            int at = s.IndexOf('@');
+            if (at <= 0 || at >= s.Length - 1) return false;
+            int dot = s.IndexOf('.', at + 1);
+            if (dot <= at + 1 || dot >= s.Length - 1) return false;
+            return true;
+        }
     }
 }
 ```
+
+## Custom Message Types
+
+Avoid string allocations or carry structured metadata by choosing your own `TMessage`.
+
+```csharp
+using Verifast;
+
+public readonly record struct Msg(string Code, string Text);
+
+public readonly ref struct EvenValidator : IValidator<int, Msg> {
+    public void Validate(in int value, ref ValidationResult<Msg> result) {
+        if ((value & 1) != 0)
+            result.AddError(new Msg("NotEven", "Value must be even"));
+    }
+}
+
+if (!new EvenValidator().TryValidate(3, out var res))
+    foreach (var e in res.Errors) Console.WriteLine($"{e.Code}: {e.Text}");
+```
+
+## Design Philosophy
+
+- Pure language constructs: write straightforward `if`/`for` statements — no fluent builders, no new mental model, onboarding takes minutes.
+- Allocation‑aware: messages are captured on demand; zero allocations when data is valid.
+
+## License
+
+MIT — see `LICENSE`.
