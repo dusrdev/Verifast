@@ -8,33 +8,30 @@ namespace Verifast.Benchmarks.Benchmarks;
 
 [MemoryDiagnoser]
 public class SyncValidationBenchmarks {
-    [Params(false, true)]
-    public bool UseInvalid { get; set; }
+    [Params(true, false)]
+    public bool DtoValid { get; set; }
 
-    private UserProfile _valid = null!;
-    private UserProfile _invalid = null!;
-    private UserProfileValidator _vfValidator = null!;
-    private UserProfileFluentValidator _fvValidator = null!;
+    private UserProfile? _dto;
 
     [GlobalSetup]
     public void Setup() {
-        _vfValidator = new UserProfileValidator();
-        _fvValidator = new UserProfileFluentValidator();
-        _valid = UserProfileFactory.CreateValid();
-        _invalid = UserProfileFactory.CreateInvalid();
+        _dto = DtoValid
+            ? UserProfileFactory.CreateValid()
+            : UserProfileFactory.CreateInvalid();
+    }
+
+    [Benchmark(Baseline = true)]
+    public int FluentValidation() {
+        var validator = new UserProfileFluentValidator();
+        var result = validator.Validate(_dto!);
+        return result.Errors.Count;
     }
 
     [Benchmark]
-    public bool Verifast_Sync_TryValidate() {
-        var dto = UseInvalid ? _invalid : _valid;
-        return _vfValidator.TryValidate(dto, out _);
-    }
-
-    [Benchmark]
-    public bool FluentValidation_Sync_Validate() {
-        var dto = UseInvalid ? _invalid : _valid;
-        var result = _fvValidator.Validate(dto);
-        return result.IsValid;
+    public int Verifast() {
+        var validator = new UserProfileValidator();
+        var result = validator.Validate(_dto!);
+        return result.Errors.Count;
     }
 }
 
