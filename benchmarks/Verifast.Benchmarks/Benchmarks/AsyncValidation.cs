@@ -1,11 +1,10 @@
 using BenchmarkDotNet.Attributes;
+
 using Verifast.Benchmarks.User;
-using Verifast.Benchmarks.Models;
 
 namespace Verifast.Benchmarks.Benchmarks;
 
-[Config(typeof(BenchmarkConfig))]
-public class AsyncValidationBenchmarks {
+public class AsyncValidation {
     [Params(true, false)]
     public bool DtoValid { get; set; }
 
@@ -38,4 +37,3 @@ public class AsyncValidationBenchmarks {
         return result.Errors.Count;
     }
 }
-

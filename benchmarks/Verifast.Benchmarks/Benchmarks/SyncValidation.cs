@@ -1,13 +1,11 @@
 using BenchmarkDotNet.Attributes;
 
 using Verifast.Benchmarks.User;
-using Verifast.Benchmarks.Models;
 
 namespace Verifast.Benchmarks.Benchmarks;
 
 [ReturnValueValidator]
-[Config(typeof(BenchmarkConfig))]
-public class SyncValidationBenchmarks {
+public class SyncValidation {
     [Params(true, false)]
     public bool DtoValid { get; set; }
 
@@ -34,4 +32,3 @@ public class SyncValidationBenchmarks {
         return result.Errors.Count;
     }
 }
-
