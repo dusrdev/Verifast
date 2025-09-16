@@ -17,7 +17,7 @@ public class BenchmarkConfig : ManualConfig {
     public BenchmarkConfig() {
         SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
         AddDiagnoser(MemoryDiagnoser.Default);
-        AddJob(Job.ShortRun.WithOutlierMode(OutlierMode.RemoveAll));
+        AddJob(Job.MediumRun.WithOutlierMode(OutlierMode.RemoveAll));
         AddColumnProvider(DefaultColumnProviders.Instance);
         AddColumn(RankColumn.Arabic);
         HideColumns(Column.Error, Column.StdDev, Column.Median, Column.RatioSD);
