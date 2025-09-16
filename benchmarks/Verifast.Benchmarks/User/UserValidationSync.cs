@@ -11,7 +11,6 @@ public sealed class UserProfileFluentValidator : AbstractValidator<UserProfile> 
         RuleFor(x => x.LastName).Must(s => !string.IsNullOrWhiteSpace(s)).MaximumLength(100);
         RuleFor(x => x.Email).Must(CommonValidation.IsValidEmail).WithMessage("Email is invalid.");
         RuleFor(x => x.Age).InclusiveBetween(13, 120);
-        RuleFor(x => x.Age).LessThan(18).WithMessage("Age is under 18.").WithSeverity(Severity.Warning);
         RuleFor(x => x.Address).NotNull();
         When(x => x.Address is not null, () => {
             RuleFor(x => x.Address!.Street)
@@ -50,10 +49,6 @@ public sealed class UserProfileFluentValidator : AbstractValidator<UserProfile> 
         // Spot-check first order
         RuleFor(x => x.Orders).Custom((orders, ctx) => {
             if (orders is null) return;
-            if (orders.Count > 100) {
-                var warn = new FluentValidation.Results.ValidationFailure("Orders", "Unusually high number of orders.") { Severity = Severity.Warning };
-                ctx.AddFailure(warn);
-            }
             if (orders.Count == 0) return;
 
             var o = orders[0];
@@ -66,22 +61,14 @@ public sealed class UserProfileFluentValidator : AbstractValidator<UserProfile> 
             if (string.IsNullOrWhiteSpace(it.Name)) ctx.AddFailure("Order item name is required.");
             if (it.Quantity <= 0) ctx.AddFailure("Order item quantity must be positive.");
             if (it.Price < 0m) ctx.AddFailure("Order item price must be non-negative.");
-
-            decimal sum = 0m;
-            for (int i = 0; i < o.Items.Count; i++) sum += o.Items[i].Price * o.Items[i].Quantity;
-            if (o.Total != 0m && Math.Abs(o.Total - sum) > 0.001m) {
-                var warn = new FluentValidation.Results.ValidationFailure("Orders[0].Total", "Order total doesn't match sum of items.") { Severity = Severity.Warning };
-                ctx.AddFailure(warn);
-            }
         });
     }
 }
 
 public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile> {
     public void Validate(in UserProfile instance, ref ValidationResult<string> result) {
-        if (instance.Id == Guid.Empty) {
+        if (instance.Id == Guid.Empty)
             result.AddError("Id must not be empty.");
-        }
 
         if (string.IsNullOrWhiteSpace(instance.FirstName)) {
             result.AddError("FirstName is required.");
@@ -95,32 +82,24 @@ public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile
             result.AddError("LastName too long.");
         }
 
-        if (!CommonValidation.IsValidEmail(instance.Email)) {
+        if (!CommonValidation.IsValidEmail(instance.Email))
             result.AddError("Email is invalid.");
-        }
 
-        if ((uint)instance.Age is < 13 or > 120) {
+        if ((uint)instance.Age is < 13 or > 120)
             result.AddError("Age must be between 13 and 120.");
-        } else if (instance.Age < 18) {
-            result.AddWarning("Age is under 18.");
-        }
 
         var addr = instance.Address;
         if (addr is null) {
             result.AddError("Address is required.");
         } else {
-            if (string.IsNullOrWhiteSpace(addr.Street)) {
+            if (string.IsNullOrWhiteSpace(addr.Street))
                 result.AddError("Street is required.");
-            }
-            if (string.IsNullOrWhiteSpace(addr.City)) {
+            if (string.IsNullOrWhiteSpace(addr.City))
                 result.AddError("City is required.");
-            }
-            if (string.IsNullOrWhiteSpace(addr.Country)) {
+            if (string.IsNullOrWhiteSpace(addr.Country))
                 result.AddError("Country is required.");
-            }
-            if (addr.PostalCode is null || addr.PostalCode.Trim().Length < 4) {
+            if (addr.PostalCode is null || addr.PostalCode.Trim().Length < 4)
                 result.AddError("PostalCode is invalid.");
-            }
         }
 
         var phones = instance.PhoneNumbers;
@@ -136,34 +115,26 @@ public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile
         }
 
         if (instance.Preferences is { } pref) {
-            if (string.IsNullOrWhiteSpace(pref.Timezone)) {
+            if (string.IsNullOrWhiteSpace(pref.Timezone))
                 result.AddError("Timezone is required.");
-            }
-            if (!CommonValidation.IsAllowedLanguage(pref.PreferredLanguage)) {
+            if (!CommonValidation.IsAllowedLanguage(pref.PreferredLanguage))
                 result.AddError("PreferredLanguage not supported.");
-            }
         } else {
             result.AddError("Preferences are required.");
         }
 
-        if (instance.RegisteredAt == default) {
+        if (instance.RegisteredAt == default)
             result.AddError("RegisteredAt is required.");
-        }
-        if (instance.LastLoginAt is { } last && last < instance.RegisteredAt) {
+        if (instance.LastLoginAt is { } last && last < instance.RegisteredAt)
             result.AddError("LastLoginAt must be >= RegisteredAt.");
-        }
 
         var orders = instance.Orders;
         if (orders is not null) {
-            if (orders.Count > 100) {
-                result.AddWarning("Unusually high number of orders.");
-            }
             // spot-check first order for structure
             if (orders.Count > 0) {
                 var o = orders[0];
-                if (o.OrderId == Guid.Empty) {
+                if (o.OrderId == Guid.Empty)
                     result.AddError("OrderId must not be empty.");
-                }
                 if (o.Items is null || o.Items.Count == 0) {
                     result.AddError("Order must have at least one item.");
                 } else {
@@ -176,15 +147,6 @@ public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile
                     }
                     if (it.Price < 0m) {
                         result.AddError("Order item price must be non-negative.");
-                    }
-                    // Check total matches sum (first order only to keep work bounded)
-                    decimal sum = 0m;
-                    for (int i = 0; i < o.Items.Count; i++) {
-                        var item = o.Items[i];
-                        sum += item.Price * item.Quantity;
-                    }
-                    if (o.Total != 0m && Math.Abs(o.Total - sum) > 0.001m) {
-                        result.AddWarning("Order total doesn't match sum of items.");
                     }
                 }
             }
