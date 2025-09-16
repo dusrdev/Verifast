@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 using FluentValidation;
 
 namespace Verifast.Benchmarks.User;
@@ -5,27 +7,38 @@ namespace Verifast.Benchmarks.User;
 public sealed class UserProfileFluentValidator : AbstractValidator<UserProfile> {
     public UserProfileFluentValidator() {
         RuleFor(x => x.Id).NotEqual(Guid.Empty);
-        RuleFor(x => x.FirstName).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.LastName).NotEmpty().MaximumLength(100);
-        RuleFor(x => x.Email).NotEmpty().EmailAddress();
+        RuleFor(x => x.FirstName).Must(s => !string.IsNullOrWhiteSpace(s)).MaximumLength(100);
+        RuleFor(x => x.LastName).Must(s => !string.IsNullOrWhiteSpace(s)).MaximumLength(100);
+        RuleFor(x => x.Email).Must(CommonValidation.IsValidEmail).WithMessage("Email is invalid.");
         RuleFor(x => x.Age).InclusiveBetween(13, 120);
+        RuleFor(x => x.Age).LessThan(18).WithMessage("Age is under 18.").WithSeverity(Severity.Warning);
         RuleFor(x => x.Address).NotNull();
         When(x => x.Address is not null, () => {
-            RuleFor(x => x.Address!.Street).NotEmpty();
-            RuleFor(x => x.Address!.City).NotEmpty();
-            RuleFor(x => x.Address!.Country).NotEmpty();
-            RuleFor(x => x.Address!.PostalCode).NotEmpty().MinimumLength(4);
+            RuleFor(x => x.Address!.Street)
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                .WithMessage("Street is required.");
+            RuleFor(x => x.Address!.City)
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                .WithMessage("City is required.");
+            RuleFor(x => x.Address!.Country)
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                .WithMessage("Country is required.");
+            RuleFor(x => x.Address!.PostalCode)
+                .Must(pc => !string.IsNullOrWhiteSpace(pc) && pc.Trim().Length >= 4)
+                .WithMessage("PostalCode is invalid.");
         });
 
         RuleFor(x => x.PhoneNumbers)
-            .Must(nums => nums is null || nums.Take(3).All(IsValidPhone))
+            .Must(nums => nums is null || nums.Take(3).All(CommonValidation.IsValidPhone))
             .WithMessage("Phone number is invalid.");
 
         RuleFor(x => x.Preferences).NotNull();
         When(x => x.Preferences is not null, () => {
-            RuleFor(x => x.Preferences!.Timezone).NotEmpty();
+            RuleFor(x => x.Preferences!.Timezone)
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                .WithMessage("Timezone is required.");
             RuleFor(x => x.Preferences!.PreferredLanguage)
-                .Must(lang => lang is "en" or "es" or "fr" or "de")
+                .Must(CommonValidation.IsAllowedLanguage)
                 .WithMessage("PreferredLanguage not supported.");
         });
 
@@ -35,44 +48,32 @@ public sealed class UserProfileFluentValidator : AbstractValidator<UserProfile> 
             .WithMessage("LastLoginAt must be >= RegisteredAt.");
 
         // Spot-check first order
-        RuleFor(x => x.Orders)
-            .Must(orders => orders is null || orders.Count == 0 || ValidateFirstOrder(orders[0]))
-            .WithMessage("Order validation failed.");
-    }
-
-    private static bool IsValidPhone(string phone) {
-        if (string.IsNullOrWhiteSpace(phone)) {
-            return false;
-        }
-        int digits = 0;
-        foreach (var ch in phone) {
-            if (ch is >= '0' and <= '9') {
-                digits++;
+        RuleFor(x => x.Orders).Custom((orders, ctx) => {
+            if (orders is null) return;
+            if (orders.Count > 100) {
+                var warn = new FluentValidation.Results.ValidationFailure("Orders", "Unusually high number of orders.") { Severity = Severity.Warning };
+                ctx.AddFailure(warn);
             }
-        }
-        return digits >= 10;
-    }
+            if (orders.Count == 0) return;
 
-    private static bool ValidateFirstOrder(Order o) {
-        if (o.OrderId == Guid.Empty) {
-            return false;
-        }
-        if (o.Items is null || o.Items.Count == 0) {
-            return false;
-        }
-        var it = o.Items[0];
-        if (string.IsNullOrWhiteSpace(it.Name) || it.Quantity <= 0 || it.Price < 0m) {
-            return false;
-        }
-        decimal sum = 0m;
-        for (int i = 0; i < o.Items.Count; i++) {
-            var item = o.Items[i];
-            sum += item.Price * item.Quantity;
-        }
-        if (o.Total != 0m && Math.Abs(o.Total - sum) > 0.001m) {
-            return false;
-        }
-        return true;
+            var o = orders[0];
+            if (o.OrderId == Guid.Empty) ctx.AddFailure("OrderId must not be empty.");
+            if (o.Items is null || o.Items.Count == 0) {
+                ctx.AddFailure("Order must have at least one item.");
+                return;
+            }
+            var it = o.Items[0];
+            if (string.IsNullOrWhiteSpace(it.Name)) ctx.AddFailure("Order item name is required.");
+            if (it.Quantity <= 0) ctx.AddFailure("Order item quantity must be positive.");
+            if (it.Price < 0m) ctx.AddFailure("Order item price must be non-negative.");
+
+            decimal sum = 0m;
+            for (int i = 0; i < o.Items.Count; i++) sum += o.Items[i].Price * o.Items[i].Quantity;
+            if (o.Total != 0m && Math.Abs(o.Total - sum) > 0.001m) {
+                var warn = new FluentValidation.Results.ValidationFailure("Orders[0].Total", "Order total doesn't match sum of items.") { Severity = Severity.Warning };
+                ctx.AddFailure(warn);
+            }
+        });
     }
 }
 
@@ -94,7 +95,7 @@ public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile
             result.AddError("LastName too long.");
         }
 
-        if (!LooksLikeEmail(instance.Email)) {
+        if (!CommonValidation.IsValidEmail(instance.Email)) {
             result.AddError("Email is invalid.");
         }
 
@@ -127,7 +128,7 @@ public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile
             // Validate up to first 3 numbers for demo purposes
             var count = Math.Min(phones.Count, 3);
             for (int i = 0; i < count; i++) {
-                if (!LooksLikePhone(phones[i])) {
+                if (!CommonValidation.IsValidPhone(phones[i])) {
                     result.AddError("Phone number is invalid.");
                     break; // don't spam errors
                 }
@@ -138,7 +139,7 @@ public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile
             if (string.IsNullOrWhiteSpace(pref.Timezone)) {
                 result.AddError("Timezone is required.");
             }
-            if (!IsAllowedLanguage(pref.PreferredLanguage)) {
+            if (!CommonValidation.IsAllowedLanguage(pref.PreferredLanguage)) {
                 result.AddError("PreferredLanguage not supported.");
             }
         } else {
@@ -189,34 +190,22 @@ public readonly ref struct UserProfileVerifastValidator : IValidator<UserProfile
             }
         }
     }
+}
 
-    private static bool LooksLikeEmail(string email) {
-        if (string.IsNullOrWhiteSpace(email)) {
-            return false;
-        }
-        var span = email.AsSpan();
-        var at = span.IndexOf('@');
-        if (at <= 0 || at >= span.Length - 3) {
-            return false;
-        }
-        var dot = span[(at + 1)..].LastIndexOf('.');
-        return dot > 0;
-    }
+internal static partial class CommonValidation {
+    [GeneratedRegex(@"^(?=.{1,254}$)(?=.{1,64}@)([A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*)@((?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,})$", RegexOptions.IgnoreCase)]
+    private static partial Regex EmailRegex();
 
-    private static bool LooksLikePhone(string phone) {
-        if (string.IsNullOrWhiteSpace(phone)) {
-            return false;
-        }
+    public static bool IsValidEmail(string email) => !string.IsNullOrWhiteSpace(email) && EmailRegex().IsMatch(email);
+
+    public static bool IsValidPhone(string phone) {
+        if (string.IsNullOrWhiteSpace(phone)) return false;
         int digits = 0;
         foreach (var ch in phone) {
-            if (ch is >= '0' and <= '9') {
-                digits++;
-            }
+            if (ch is >= '0' and <= '9') digits++;
         }
         return digits >= 10;
     }
 
-    private static bool IsAllowedLanguage(string lang) {
-        return lang is "en" or "es" or "fr" or "de";
-    }
+    public static bool IsAllowedLanguage(string lang) => lang is "en" or "es" or "fr" or "de";
 }
