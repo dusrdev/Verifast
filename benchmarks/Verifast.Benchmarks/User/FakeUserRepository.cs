@@ -1,24 +1,40 @@
+using Bogus;
+
 namespace Verifast.Benchmarks.User;
 
 public sealed class FakeUserRepository {
+    private static readonly Faker MyFaker = new();
+
+    private static readonly string[] DefaultBlacklistedDomains = [
+        "spam.com",
+        "malware.test"
+    ];
+
     private readonly HashSet<string> _emails;
     private readonly HashSet<string> _blacklistedDomains;
     private readonly TimeSpan _delay;
 
     public FakeUserRepository(IEnumerable<string>? seedEmails = null, IEnumerable<string>? blacklistedDomains = null, TimeSpan? opDelay = null) {
         _emails = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        if (seedEmails is not null) {
-            foreach (var e in seedEmails) {
-                _emails.Add(e);
+        if (seedEmails is null) {
+            for (var i = 0; i < 10; i++) {
+                _emails.Add(MyFaker.Internet.Email());
+            }
+        } else {
+            foreach (var email in seedEmails) {
+                _emails.Add(email);
             }
         }
-        _blacklistedDomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
-            "spam.com",
-            "malware.test"
-        };
-        if (blacklistedDomains is not null) {
-            foreach (var d in blacklistedDomains) {
-                _blacklistedDomains.Add(d);
+
+        _blacklistedDomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        _blacklistedDomains.UnionWith(DefaultBlacklistedDomains);
+        if (blacklistedDomains is null) {
+            for (var i = 0; i < 3; i++) {
+                _blacklistedDomains.Add(MyFaker.Internet.DomainName());
+            }
+        } else {
+            foreach (var domain in blacklistedDomains) {
+                _blacklistedDomains.Add(domain);
             }
         }
         _delay = opDelay ?? TimeSpan.FromMilliseconds(0.25);
