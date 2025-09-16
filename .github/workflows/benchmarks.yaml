@@ -7,6 +7,10 @@ on:
 jobs:
   benchmarks:
     runs-on: ubuntu-latest
+
+    env:
+      PROJECT: benchmarks/Verifast.Benchmarks/Verifast.Benchmarks.csproj
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -17,4 +21,4 @@ jobs:
           dotnet-version: 9.0.x
 
       - name: Run Benchmarks
-        run: dotnet run --project benchmarks/Verifast.Benchmarks/Verifast.Benchmarks.csproj --configuration Release -- --filter '*'
+        run: dotnet run --project ${{ env.PROJECT }} --configuration Release -- --filter '*'
