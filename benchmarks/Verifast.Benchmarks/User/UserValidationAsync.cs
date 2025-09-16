@@ -5,11 +5,13 @@ namespace Verifast.Benchmarks.User;
 public sealed class UserProfileFluentAsyncValidator : AbstractValidator<UserProfile> {
     public UserProfileFluentAsyncValidator(FakeUserRepository repo) {
         RuleFor(x => x.Email)
-            .NotEmpty()
-            .MustAsync(repo.IsDomainAllowedAsync)
-            .WithMessage("Email domain is not allowed.")
-            .MustAsync(repo.IsEmailUniqueAsync)
-            .WithMessage("Email is already taken.");
+            .Cascade(CascadeMode.Stop)
+                .Must(s => !string.IsNullOrWhiteSpace(s))
+                    .WithMessage("Email is required.")
+                .MustAsync(repo.IsDomainAllowedAsync)
+                    .WithMessage("Email domain is not allowed.")
+                .MustAsync(repo.IsEmailUniqueAsync)
+                    .WithMessage("Email is already taken.");
 
         RuleFor(x => x.Age).GreaterThanOrEqualTo(13);
         RuleFor(x => x.RegisteredAt).NotEqual(default(DateTimeOffset));
