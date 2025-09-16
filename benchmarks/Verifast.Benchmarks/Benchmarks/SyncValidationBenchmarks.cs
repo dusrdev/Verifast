@@ -5,11 +5,8 @@ using Verifast.Benchmarks.Models;
 
 namespace Verifast.Benchmarks.Benchmarks;
 
-[MediumRunJob]
-[MemoryDiagnoser]
-[RankColumn]
 [ReturnValueValidator]
-[Config(typeof(TrentRatioConfig))]
+[Config(typeof(BenchmarkConfig))]
 public class SyncValidationBenchmarks {
     [Params(true, false)]
     public bool DtoValid { get; set; }

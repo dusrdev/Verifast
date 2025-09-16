@@ -4,10 +4,7 @@ using Verifast.Benchmarks.Models;
 
 namespace Verifast.Benchmarks.Benchmarks;
 
-[MediumRunJob]
-[MemoryDiagnoser]
-[RankColumn]
-[Config(typeof(TrentRatioConfig))]
+[Config(typeof(BenchmarkConfig))]
 public class AsyncValidationBenchmarks {
     [Params(true, false)]
     public bool DtoValid { get; set; }
