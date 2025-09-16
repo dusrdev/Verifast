@@ -1,8 +1,6 @@
 using BenchmarkDotNet.Attributes;
-using Verifast.Benchmarks.FluentValidators;
-using Verifast.Benchmarks.Infrastructure;
+using Verifast.Benchmarks.User;
 using Verifast.Benchmarks.Models;
-using Verifast.Benchmarks.VerifastValidators;
 
 namespace Verifast.Benchmarks.Benchmarks;
 

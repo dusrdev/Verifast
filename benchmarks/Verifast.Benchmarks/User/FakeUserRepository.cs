@@ -1,4 +1,4 @@
-namespace Verifast.Benchmarks.Infrastructure;
+namespace Verifast.Benchmarks.User;
 
 public sealed class FakeUserRepository {
     private readonly HashSet<string> _emails;

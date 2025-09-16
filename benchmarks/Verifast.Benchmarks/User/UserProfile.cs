@@ -1,4 +1,4 @@
-namespace Verifast.Benchmarks.Models;
+namespace Verifast.Benchmarks.User;
 
 public class UserProfile {
     public Guid Id { get; set; }
