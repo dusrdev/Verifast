@@ -21,6 +21,10 @@ High‑performance, allocation‑friendly validation for .NET 9 and above. No co
 dotnet add package Verifast
 ```
 
+## Versioning
+
+While the version is below `1.0.0.0` minor versions can change the public API without warning (SemVer will not be followed until `1.0.0.0` is reached).
+
 ## Quick Start
 
 Define your model and implement its validator. Then call the extension helpers.
