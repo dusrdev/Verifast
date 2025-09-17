@@ -1,7 +1,7 @@
 # Verifast
 
 [![NuGet](https://img.shields.io/nuget/v/Verifast.svg?style=flat-square)](https://www.nuget.org/packages/Verifast)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Verifast.svg?style=flat-square)](https://www.nuget.org/packages/Verifast)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Verifast?style=flat&label=Downloads)](https://www.nuget.org/packages/Verifast)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=flat-square)](#)
 
