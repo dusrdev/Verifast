@@ -3,12 +3,12 @@
 This file provides guidance to agents when working with code in this repository.
 
 ## Project Overview
-- Tech: Multi‑targeted .NET library (`src/Verifast`) targeting `net9.0` and `netstandard2.0`, focused on fast, allocation‑aware validation. Unit tests live in `tests/Verifast.Tests.Unit` (net9.0) using xUnit v3 with the Microsoft Testing Platform, and `tests/Verifast.Tests.Unit.Standard` (net8.0) using xUnit v2 to exercise the `netstandard2.0` target. A minimal benchmarks project exists under `benchmarks/Verifast.Benchmarks` (net9.0).
+- Tech: Multi‑targeted .NET library (`src/Verifast`) targeting `net9.0`, `netstandard2.1`, and `netstandard2.0`, focused on fast, allocation‑aware validation. Unit tests live in `tests/Verifast.Tests.Unit` (net9.0) using xUnit v3 with the Microsoft Testing Platform, and `tests/Verifast.Tests.Unit.Standard` (net8.0) using xUnit v2 to exercise the `netstandard2.0` target. A minimal benchmarks project exists under `benchmarks/Verifast.Benchmarks` (net9.0).
 - Design: The library centers on simple, interface‑driven validators and a lightweight result type that captures errors and warnings only when needed.
 
 ## Big‑Picture Architecture
 - Validation contracts:
-  - `IValidator<T, TMessage>` and `IValidator<T>`: synchronous validators. On `net9.0`, both use `where T : allows ref struct` so validators can be used with stack‑only types without forcing `ref struct` everywhere. On `netstandard2.0`, the constraint is omitted.
+  - `IValidator<T, TMessage>` and `IValidator<T>`: synchronous validators. On `net9.0`, both use `where T : allows ref struct` so validators can be used with stack‑only types without forcing `ref struct` everywhere. On `netstandard2.1`/`netstandard2.0`, the constraint is omitted.
   - `IAsyncValidator<T, TMessage>` and `IAsyncValidator<T>`: asynchronous validators returning `ValueTask<ValidationResult<...>>` across targets. The `netstandard2.0` forms are declared with `in T` variance.
 - Orchestrator APIs:
   - Static `Validator` class: extension methods for synchronous validation and `TryValidate` overloads. Only sync helpers exist (no async orchestrator today). On `net9.0` the extensions include `allows ref struct` constraints.

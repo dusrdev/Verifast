@@ -25,7 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/Verifast/Verifast.csproj" />
+    <ProjectReference Include="../../src/Verifast/Verifast.csproj"
+                      AdditionalProperties="TargetFramework=netstandard2.0" />
   </ItemGroup>
 
 </Project>
