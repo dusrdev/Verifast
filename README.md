@@ -3,9 +3,9 @@
 [![NuGet](https://img.shields.io/nuget/v/Verifast.svg?style=flat-square)](https://www.nuget.org/packages/Verifast)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Verifast?style=flat&label=Downloads)](https://www.nuget.org/packages/Verifast)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
-[![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=flat-square)](#)
+[![.NET](https://img.shields.io/badge/.NET-net9.0%20%7C%20netstandard2.1%20%7C%20netstandard2.0-512BD4?style=flat-square)](#)
 
-High‑performance, allocation‑friendly validation for .NET 9 and above. No complicated APIs, no expression trees - just plain C#. Implement a tiny interface, add errors or warnings, and you’re done.
+High‑performance, allocation‑friendly validation for .NET 9 and netstandard (2.1/2.0). No complicated APIs, no expression trees - just plain C#. Implement a tiny interface, add errors or warnings, and you’re done.
 
 ## Why Verifast
 
@@ -21,10 +21,6 @@ High‑performance, allocation‑friendly validation for .NET 9 and above. No co
 dotnet add package Verifast
 ```
 
-## Versioning
-
-While the version is below `1.0.0.0` minor versions can change the public API without warning (SemVer will not be followed until `1.0.0.0` is reached).
-
 ## Quick Start
 
 Define your model and implement its validator. Then call the extension helpers.
@@ -34,7 +30,7 @@ using Verifast;
 
 public readonly record struct User(string? Name, int Age);
 
-public readonly ref struct UserValidator : IValidator<User> {
+public readonly struct UserValidator : IValidator<User> {
     public void Validate(in User instance, ref ValidationResult<string> result) {
         if (string.IsNullOrWhiteSpace(instance.Name))
             result.AddError("'Name' must be non-empty");
@@ -95,7 +91,7 @@ using Verifast;
 
 public readonly record struct Msg(string Code, string Text);
 
-public readonly ref struct EvenValidator : IValidator<int, Msg> {
+public readonly struct EvenValidator : IValidator<int, Msg> {
     public void Validate(in int value, ref ValidationResult<Msg> result) {
         if ((value & 1) != 0)
             result.AddError(new Msg("NotEven", "Value must be even"));

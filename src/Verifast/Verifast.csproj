@@ -54,8 +54,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <PackageReleaseNotes>
-    </PackageReleaseNotes>
+    <PackageReleaseNotes>Added support for netstandard2.0 and netstandard2.1.</PackageReleaseNotes>
   </PropertyGroup>
 
 </Project>
