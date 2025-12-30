@@ -22,7 +22,7 @@ public class BenchmarkConfig : ManualConfig {
         AddJob(Job.MediumRun.WithOutlierMode(OutlierMode.RemoveAll).WithIterationTime(TimeInterval.FromMilliseconds(100)));
         AddColumnProvider(DefaultColumnProviders.Instance);
         AddColumn(RankColumn.Arabic);
-        HideColumns(Column.Error, Column.StdDev, Column.Median, Column.RatioSD, Column.Gen0, Column.Gen1, Column.Gen2);
+        HideColumns(Column.Error, Column.StdDev, Column.Median, Column.RatioSD, Column.Gen0, Column.Gen1, Column.Gen2, Column.Rank);
         WithOrderer(new GroupByTypeOrderer());
         WithOptions(ConfigOptions.JoinSummary);
         WithOptions(ConfigOptions.StopOnFirstError);
