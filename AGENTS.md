@@ -3,7 +3,7 @@
 This file provides guidance to agents when working with code in this repository.
 
 ## Project Overview
-- Tech: Multi‑targeted .NET library (`src/Verifast`) targeting `net9.0` and `netstandard2.0`, focused on fast, allocation‑aware validation. Unit tests live in `tests/Verifast.Tests.Unit` (net9.0) using xUnit v3 with the Microsoft Testing Platform. A minimal benchmarks project exists under `benchmarks/Verifast.Benchmarks` (net9.0).
+- Tech: Multi‑targeted .NET library (`src/Verifast`) targeting `net9.0` and `netstandard2.0`, focused on fast, allocation‑aware validation. Unit tests live in `tests/Verifast.Tests.Unit` (net9.0) using xUnit v3 with the Microsoft Testing Platform, and `tests/Verifast.Tests.Unit.Standard` (net8.0) using xUnit v2 to exercise the `netstandard2.0` target. A minimal benchmarks project exists under `benchmarks/Verifast.Benchmarks` (net9.0).
 - Design: The library centers on simple, interface‑driven validators and a lightweight result type that captures errors and warnings only when needed.
 
 ## Big‑Picture Architecture
@@ -24,6 +24,7 @@ This file provides guidance to agents when working with code in this repository.
 ## Repository Layout
 - `src/Verifast`: Library code (`IValidator`, `IAsyncValidator`, `Validator`, `ValidationResult`).
 - `tests/Verifast.Tests.Unit`: xUnit v3 tests referencing the library. Configured as `OutputType Exe` to support Microsoft Testing Platform.
+- `tests/Verifast.Tests.Unit.Standard`: xUnit v2 tests targeting `net8.0` so the library resolves to its `netstandard2.0` target.
 - `benchmarks/Verifast.Benchmarks`: BenchmarkDotNet project (scaffolded).
 - `Verifast.slnx`: Solution file exists, but project‑scoped commands are preferred.
 
@@ -40,6 +41,9 @@ Note: Favor project‑scoped commands (operate on `src/Verifast` or `tests/Verif
 
 - Run all tests (Microsoft Testing Platform via dotnet run):
   - From repo root: `dotnet run --project tests/Verifast.Tests.Unit`
+
+- Run netstandard2.0 coverage tests (xUnit v2 via dotnet test):
+  - `dotnet test tests/Verifast.Tests.Unit.Standard`
 
 - List tests (Microsoft Testing Platform semantics):
   - `dotnet run --project tests/Verifast.Tests.Unit -- --list-tests`
