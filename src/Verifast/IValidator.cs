@@ -1,5 +1,6 @@
 ﻿namespace Verifast;
 
+#if NET9_0_OR_GREATER
 /// <summary>
 /// Interface for implementing a synchronous validator for <typeparamref name="T"/> with message type <typeparamref name="TMessage"/>
 /// </summary>
@@ -55,3 +56,60 @@ public interface IAsyncValidator<T> {
     /// <returns></returns>
     ValueTask<ValidationResult<string>> ValidateAsync(T instance, CancellationToken ct = default);
 }
+#else
+/// <summary>
+/// Interface for implementing a synchronous validator for <typeparamref name="T"/> with message type <typeparamref name="TMessage"/>
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <typeparam name="TMessage"></typeparam>
+public interface IValidator<T, TMessage> {
+    /// <summary>
+    /// Validate method
+    /// </summary>
+    /// <param name="instance"></param>
+    /// <param name="result"></param>
+    void Validate(in T instance, ref ValidationResult<TMessage> result);
+}
+
+/// <summary>
+/// Interface for implementing a synchronous validator for <typeparamref name="T"/>
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IValidator<T> {
+    /// <summary>
+	/// Validate method
+	/// </summary>
+	/// <param name="instance"></param>
+	/// <param name="result"></param>
+    void Validate(in T instance, ref ValidationResult<string> result);
+}
+
+/// <summary>
+/// Interface for implementing an asynchronous validator for <typeparamref name="T"/> with message type <typeparamref name="TMessage"/>
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <typeparam name="TMessage"></typeparam>
+public interface IAsyncValidator<T, TMessage> {
+    /// <summary>
+    /// ValidateAsync method
+    /// </summary>
+    /// <param name="instance"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    Task<ValidationResult<TMessage>> ValidateAsync(T instance, CancellationToken ct = default);
+}
+
+/// <summary>
+/// Interface for implementing an asynchronous validator for <typeparamref name="T"/>
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IAsyncValidator<T> {
+    /// <summary>
+    /// ValidateAsync method
+    /// </summary>
+    /// <param name="instance"></param>
+    /// <param name="ct"></param>
+    /// <returns></returns>
+    Task<ValidationResult<string>> ValidateAsync(T instance, CancellationToken ct = default);
+}
+#endif
