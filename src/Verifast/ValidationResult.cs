@@ -9,6 +9,13 @@ public struct ValidationResult<TMessage> {
     private List<TMessage>? _errors;
     private List<TMessage>? _warnings;
 
+    private static readonly ReadOnlyCollection<TMessage> Empty =
+#if NET
+        ReadOnlyCollection<TMessage>.Empty;
+#else
+        new(Array.Empty<TMessage>());
+#endif
+
     /// <summary>
     /// The result is valid if no errors were found.
     /// </summary>
@@ -20,7 +27,7 @@ public struct ValidationResult<TMessage> {
     public readonly ReadOnlyCollection<TMessage> Errors
         => _errors is not null
         ? new ReadOnlyCollection<TMessage>(_errors)
-        : ReadOnlyCollection<TMessage>.Empty;
+        : Empty;
 
     /// <summary>
     /// A <see cref="ReadOnlyCollection{TMessage}"/> of the <see cref="Warnings"/>
@@ -28,14 +35,14 @@ public struct ValidationResult<TMessage> {
     public readonly ReadOnlyCollection<TMessage> Warnings
         => _warnings is not null
         ? new ReadOnlyCollection<TMessage>(_warnings)
-        : ReadOnlyCollection<TMessage>.Empty;
+        : Empty;
 
     /// <summary>
     /// Adds an error to the validation result
     /// </summary>
     /// <param name="message"></param>
     public void AddError(TMessage message) {
-        _errors ??= new List<TMessage>();
+        _errors ??= [];
         _errors.Add(message);
     }
 
@@ -44,7 +51,7 @@ public struct ValidationResult<TMessage> {
     /// </summary>
     /// <param name="message"></param>
     public void AddWarning(TMessage message) {
-        _warnings ??= new List<TMessage>();
+        _warnings ??= [];
         _warnings.Add(message);
     }
 }

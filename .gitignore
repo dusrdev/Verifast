@@ -15,8 +15,6 @@
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
-*WARP.md
-*AGENTS.md
 
 # Mono auto generated files
 mono_crash.*

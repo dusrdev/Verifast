@@ -1,5 +1,6 @@
 ﻿namespace Verifast;
 
+#if NET9_0_OR_GREATER
 /// <summary>
 /// Interface for implementing a synchronous validator for <typeparamref name="T"/> with message type <typeparamref name="TMessage"/>
 /// </summary>
@@ -26,32 +27,31 @@ public interface IValidator<T> where T : allows ref struct {
 	/// <param name="result"></param>
     void Validate(in T instance, ref ValidationResult<string> result);
 }
-
+#else
 /// <summary>
-/// Interface for implementing an asynchronous validator for <typeparamref name="T"/> with message type <typeparamref name="TMessage"/>
+/// Interface for implementing a synchronous validator for <typeparamref name="T"/> with message type <typeparamref name="TMessage"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <typeparam name="TMessage"></typeparam>
-public interface IAsyncValidator<T, TMessage> {
+public interface IValidator<T, TMessage> {
     /// <summary>
-    /// ValidateAsync method
+    /// Validate method
     /// </summary>
     /// <param name="instance"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    ValueTask<ValidationResult<TMessage>> ValidateAsync(T instance, CancellationToken ct = default);
+    /// <param name="result"></param>
+    void Validate(in T instance, ref ValidationResult<TMessage> result);
 }
 
 /// <summary>
-/// Interface for implementing an asynchronous validator for <typeparamref name="T"/>
+/// Interface for implementing a synchronous validator for <typeparamref name="T"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IAsyncValidator<T> {
+public interface IValidator<T> {
     /// <summary>
-    /// ValidateAsync method
-    /// </summary>
-    /// <param name="instance"></param>
-    /// <param name="ct"></param>
-    /// <returns></returns>
-    ValueTask<ValidationResult<string>> ValidateAsync(T instance, CancellationToken ct = default);
+	/// Validate method
+	/// </summary>
+	/// <param name="instance"></param>
+	/// <param name="result"></param>
+    void Validate(in T instance, ref ValidationResult<string> result);
 }
+#endif

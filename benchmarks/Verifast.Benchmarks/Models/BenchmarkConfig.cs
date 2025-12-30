@@ -3,12 +3,14 @@ using System.Collections.Immutable;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
+using Perfolizer.Horology;
 using Perfolizer.Mathematics.OutlierDetection;
 
 namespace Verifast.Benchmarks.Models;
@@ -17,14 +19,15 @@ public class BenchmarkConfig : ManualConfig {
     public BenchmarkConfig() {
         SummaryStyle = SummaryStyle.Default.WithRatioStyle(RatioStyle.Trend);
         AddDiagnoser(MemoryDiagnoser.Default);
-        AddJob(Job.MediumRun.WithOutlierMode(OutlierMode.RemoveAll));
+        AddJob(Job.MediumRun.WithOutlierMode(OutlierMode.RemoveAll).WithIterationTime(TimeInterval.FromMilliseconds(100)));
         AddColumnProvider(DefaultColumnProviders.Instance);
         AddColumn(RankColumn.Arabic);
-        HideColumns(Column.Error, Column.StdDev, Column.Median, Column.RatioSD);
+        HideColumns(Column.Error, Column.StdDev, Column.Median, Column.RatioSD, Column.Gen0, Column.Gen1, Column.Gen2, Column.Rank);
         WithOrderer(new GroupByTypeOrderer());
         WithOptions(ConfigOptions.JoinSummary);
         WithOptions(ConfigOptions.StopOnFirstError);
         WithOptions(ConfigOptions.DisableLogFile);
+        AddExporter(MarkdownExporter.GitHub);
         AddLogger(ConsoleLogger.Default);
     }
 }
