@@ -7,7 +7,7 @@ public class AsyncUserDto : IAsyncValidator<AsyncUserDto> {
     public string? Password { get; set; }
     public string? Phone { get; set; }
 
-    public async Task<ValidationResult<string>> ValidateAsync(AsyncUserDto instance, CancellationToken ct = default) {
+    public async ValueTask<ValidationResult<string>> ValidateAsync(AsyncUserDto instance, CancellationToken ct = default) {
         // Emulate asynchronous work so tests exercise the async path
         await Task.Yield();
         ct.ThrowIfCancellationRequested();

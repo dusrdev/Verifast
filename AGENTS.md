@@ -9,7 +9,7 @@ This file provides guidance to agents when working with code in this repository.
 ## Big‑Picture Architecture
 - Validation contracts:
   - `IValidator<T, TMessage>` and `IValidator<T>`: synchronous validators. On `net9.0`, both use `where T : allows ref struct` so validators can be used with stack‑only types without forcing `ref struct` everywhere. On `netstandard2.0`, the constraint is omitted.
-  - `IAsyncValidator<T, TMessage>` and `IAsyncValidator<T>`: asynchronous validators. On `net9.0` they return `ValueTask<ValidationResult<...>>`; on `netstandard2.0` they return `Task<ValidationResult<...>>` and are declared with `in T` variance.
+  - `IAsyncValidator<T, TMessage>` and `IAsyncValidator<T>`: asynchronous validators returning `ValueTask<ValidationResult<...>>` across targets. The `netstandard2.0` forms are declared with `in T` variance.
 - Orchestrator APIs:
   - Static `Validator` class: extension methods for synchronous validation and `TryValidate` overloads. Only sync helpers exist (no async orchestrator today). On `net9.0` the extensions include `allows ref struct` constraints.
 - Result type:
