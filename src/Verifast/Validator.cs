@@ -82,7 +82,8 @@ public static class Validator {
     /// <param name="validator"></param>
     /// <param name="instance"></param>
     /// <returns></returns>
-    public static ValidationResult<TMessage> Validate<TValidator, T, TMessage>(this TValidator validator, in T instance) {
+    public static ValidationResult<TMessage> Validate<TValidator, T, TMessage>(this TValidator validator, in T instance)
+        where TValidator : IValidator<T, TMessage> {
         ValidationResult<TMessage> result = default;
         validator.Validate(in instance, ref result);
         return result;
@@ -96,7 +97,8 @@ public static class Validator {
 	/// <param name="validator"></param>
 	/// <param name="instance"></param>
 	/// <returns></returns>
-	public static ValidationResult<string> Validate<TValidator, T>(this TValidator validator, in T instance) {
+	public static ValidationResult<string> Validate<TValidator, T>(this TValidator validator, in T instance) 
+        where TValidator : IValidator<T> {
         ValidationResult<string> result = default;
         validator.Validate(in instance, ref result);
         return result;
@@ -112,7 +114,8 @@ public static class Validator {
     /// <param name="instance"></param>
     /// <param name="result"></param>
     /// <returns>True if <paramref name="instance"/> is valid.</returns>
-    public static bool TryValidate<TValidator, T, TMessage>(this TValidator validator, in T instance, out ValidationResult<TMessage> result) {
+    public static bool TryValidate<TValidator, T, TMessage>(this TValidator validator, in T instance, out ValidationResult<TMessage> result)
+        where TValidator : IValidator<T, TMessage> {
         result = default;
         validator.Validate(in instance, ref result);
         return result.IsValid;
@@ -127,7 +130,8 @@ public static class Validator {
 	/// <param name="instance"></param>
 	/// <param name="result"></param>
 	/// <returns>True if <paramref name="instance"/> is valid.</returns>
-	public static bool TryValidate<TValidator, T>(this TValidator validator, in T instance, out ValidationResult<string> result) {
+	public static bool TryValidate<TValidator, T>(this TValidator validator, in T instance, out ValidationResult<string> result)
+        where TValidator : IValidator<T> {
         result = default;
         validator.Validate(in instance, ref result);
         return result.IsValid;

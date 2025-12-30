@@ -42,7 +42,7 @@ public struct ValidationResult<TMessage> {
     /// </summary>
     /// <param name="message"></param>
     public void AddError(TMessage message) {
-        _errors ??= new List<TMessage>();
+        _errors ??= [];
         _errors.Add(message);
     }
 
@@ -51,7 +51,7 @@ public struct ValidationResult<TMessage> {
     /// </summary>
     /// <param name="message"></param>
     public void AddWarning(TMessage message) {
-        _warnings ??= new List<TMessage>();
+        _warnings ??= [];
         _warnings.Add(message);
     }
 }

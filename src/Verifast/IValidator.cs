@@ -89,7 +89,7 @@ public interface IValidator<T> {
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <typeparam name="TMessage"></typeparam>
-public interface IAsyncValidator<T, TMessage> {
+public interface IAsyncValidator<in T, TMessage> {
     /// <summary>
     /// ValidateAsync method
     /// </summary>
@@ -103,7 +103,7 @@ public interface IAsyncValidator<T, TMessage> {
 /// Interface for implementing an asynchronous validator for <typeparamref name="T"/>
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IAsyncValidator<T> {
+public interface IAsyncValidator<in T> {
     /// <summary>
     /// ValidateAsync method
     /// </summary>
